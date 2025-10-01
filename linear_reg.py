@@ -51,10 +51,28 @@ def pretty_print_poly(intercept: np.ndarray, coefs: np.ndarray) -> None:
     This is a helper function to visualize the learned model.
     This is necessary for completing step #4 in the assignment handout.
     '''
-    terms = [f"{intercept[0]:.4f}"]
-    for i, coef in enumerate(coefs):
-        terms.append(f"{coef:.4f} * x_{i+1}")
-    equation = " + ".join(terms)
+    # Handle both scalar and array intercepts
+    if isinstance(intercept, np.ndarray):
+        intercept_val = intercept[0] if intercept.size > 0 else intercept.item()
+    else:
+        intercept_val = intercept
+    
+    terms = [f"{intercept_val:.2f}"]
+    
+    # Handle coefficients array properly
+    if isinstance(coefs, np.ndarray):
+        coefs_flat = coefs.flatten()
+    else:
+        coefs_flat = [coefs]
+    
+    for i, coef in enumerate(coefs_flat):
+        coef_val = coef.item() if isinstance(coef, np.ndarray) else coef
+        if coef_val >= 0:
+            terms.append(f" + {coef_val:.2f} * x_{i+1}")
+        else:
+            terms.append(f" - {abs(coef_val):.2f} * x_{i+1}")
+    
+    equation = "".join(terms)
     print(f"y = {equation}")
 
 def generate_weights(x: np.ndarray, y: np.ndarray):
