@@ -141,15 +141,6 @@ def policy_evaluation(env, V, pi, gamma, noise):
     TODO: Implement one swep policy evaluation to compute V(s) given policy pi:
     update V(s) given policy pi, the environment dynamics, and gamma
     """
-    for s in env.all_states():
-        if env.is_terminal(s) or env.is_obstacle(s):
-            continue
-        v = 0.0
-        for a, a_prob in enumerate(pi[s[0], s[1], :]):
-            for s_next, p in transition_dist(env, s, a, noise):
-                r = env.reward(s, a, s_next)
-                v += a_prob * p * (r + gamma * V[s_next[0], s_next[1]])
-        V_new[s[0], s[1]] = v
     return V_new
 
 def policy_improvement(env, V, gamma, noise):
@@ -157,22 +148,7 @@ def policy_improvement(env, V, gamma, noise):
     """
     TODO: Implement policy improvement: update pi greedily based on current V(s).
     """
-    stable = True
-    for s in env.all_states():
-        if env.is_terminal(s) or env.is_obstacle(s):
-            continue
-        q_values = np.zeros(4)
-        for a in ACTIONS:
-            for s_next, p in transition_dist(env, s, a, noise):
-                r = env.reward(s, a, s_next)
-                q_values[a] += p * (r + gamma * V[s_next[0], s_next[1]])
-        best_a = np.flatnonzero(np.isclose(q_values, q_values.max()))
-        new_action_prob = np.zeros(4)
-        new_action_prob[best_a] = 1.0 / len(best_a)
-        if not np.array_equal(new_action_prob, pi_new[s[0], s[1], :]):
-            stable = False
-        pi_new[s[0], s[1], :] = new_action_prob
-    return pi_new, stable
+    return pi_new, True
 
 def policy_iteration(env, gamma, noise, max_eval_iters=100, tol=1e-6):
     V = np.zeros((env.H, env.W))
@@ -181,13 +157,6 @@ def policy_iteration(env, gamma, noise, max_eval_iters=100, tol=1e-6):
     """
     TODO: Combine policy evaluation and improvement to perform policy iteration.
     """
-    while not stable:
-        for _ in range(max_eval_iters):
-            V_new = policy_evaluation(env, V, pi, gamma, noise)
-            if np.max(np.abs(V_new - V)) < tol:
-                break
-            V = V_new
-        pi, stable = policy_improvement(env, V, gamma, noise)
     return V, pi
 
 def extract_path(env, pi, start, max_steps=50):
