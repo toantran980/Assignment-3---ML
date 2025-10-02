@@ -84,7 +84,7 @@ def generate_weights(x: np.ndarray, y: np.ndarray):
     gram = x.T @ x
     gram_inv = np.linalg.inv(gram)
     xTy = x.T @ y
-    return gram_inv @ xTy
+    return gram_inv @ xTy 
 
 if __name__ == "__main__":
 
@@ -115,6 +115,7 @@ if __name__ == "__main__":
 
     # Load the dataset from GasProperties.csv
     dataset = load_dataset_pd("GasProperties.csv")
+
     # Preprocess the dataset to separate features and target variable
     X, Y = split_xy(dataset)
     X_train, Y_train, X_test, Y_test = split_training_test(X,Y)
