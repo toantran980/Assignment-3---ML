@@ -141,6 +141,19 @@ def policy_evaluation(env, V, pi, gamma, noise):
     TODO: Implement one swep policy evaluation to compute V(s) given policy pi:
     update V(s) given policy pi, the environment dynamics, and gamma
     """
+    for r in range(env.H):
+        for c in range(env.W):
+            s = (r, c)
+            if env.is_terminal(s) or env.is_obstacle(s):
+                continue
+            v = 0.0
+            for a in ACTIONS:
+                action_prob = pi[s[0], s[1], a] # probability of taking action a in state s
+                transitions = transition_dist(env, s, a, noise)
+                for s_next, p in transitions:
+                    rwd = env.reward(s, a, s_next)
+                    v += action_prob * p * (rwd + gamma * V[s_next[0], s_next[1]]) # accumulate expected value
+            V_new[s[0], s[1]] = v
     return V_new
 
 def policy_improvement(env, V, gamma, noise):
@@ -148,6 +161,23 @@ def policy_improvement(env, V, gamma, noise):
     """
     TODO: Implement policy improvement: update pi greedily based on current V(s).
     """
+    for r in range(env.H):
+        for c in range(env.W):
+            s = (r, c)
+            # For terminal or obstacle states, set policy to all zeros
+            if env.is_terminal(s) or env.is_obstacle(s):
+                pi_new[r, c, :] = 0.0  # Policy is all zeros for terminal/obstacle
+                continue
+            q_values = np.zeros(4)
+            for a in ACTIONS:
+                transitions = transition_dist(env, s, a, noise)
+                for s_next, p in transitions:
+                    rwd = env.reward(s, a, s_next)
+                    q_values[a] += p * (rwd + gamma * V[s_next[0], s_next[1]])
+            best_a = np.flatnonzero(np.isclose(q_values, q_values.max()))
+            new_action_prob = np.zeros(4)
+            new_action_prob[best_a] = 1.0 / len(best_a)
+            pi_new[s[0], s[1], :] = new_action_prob
     return pi_new, True
 
 def policy_iteration(env, gamma, noise, max_eval_iters=100, tol=1e-6):
@@ -157,6 +187,14 @@ def policy_iteration(env, gamma, noise, max_eval_iters=100, tol=1e-6):
     """
     TODO: Combine policy evaluation and improvement to perform policy iteration.
     """
+    while not stable:
+        for _ in range(max_eval_iters):
+            V_new = policy_evaluation(env, V, pi, gamma, noise)
+            if np.max(np.abs(V_new - V)) < tol:
+                break
+            V = V_new
+        pi_new, stable = policy_improvement(env, V, gamma, noise)
+        pi = pi_new
     return V, pi
 
 def extract_path(env, pi, start, max_steps=50):
