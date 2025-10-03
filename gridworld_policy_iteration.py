@@ -173,7 +173,9 @@ def policy_improvement(env, V, gamma, noise):
                 transitions = transition_dist(env, s, a, noise)
                 for s_next, p in transitions:
                     rwd = env.reward(s, a, s_next)
+                    # Accumulate Q-value for action a
                     q_values[a] += p * (rwd + gamma * V[s_next[0], s_next[1]])
+            # Find the best action(s) and set their probabilities equally
             best_a = np.flatnonzero(np.isclose(q_values, q_values.max()))
             new_action_prob = np.zeros(4)
             new_action_prob[best_a] = 1.0 / len(best_a)
