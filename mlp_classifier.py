@@ -12,7 +12,7 @@ def basic_mlp_setup() -> MLPClassifier:
     Do not change the number of layers or neurons in this function.
     You may tweak hyperparameters like max_iter to ensure convergence.
     '''
-    return MLPClassifier(hidden_layer_sizes=(3,), max_iter=1000, random_state=42)
+    return MLPClassifier(hidden_layer_sizes=(3,), max_iter=3000, random_state=42)
 
 def advanced_mlp_setup() -> MLPClassifier:
     '''
@@ -26,7 +26,7 @@ def advanced_mlp_setup() -> MLPClassifier:
         activation= "relu",
         solver= "adam",
         alpha= 0.001,
-        max_iter= 2000,
+        max_iter= 3000,
         learning_rate= "adaptive",
         random_state=42
     )
