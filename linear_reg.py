@@ -94,7 +94,7 @@ if __name__ == "__main__":
     # Hint: You can use numpy arrays to store the data.
     x = np.array([-3.0, -2.5, -2.0, -1.5, -1.0, 0.0, 1.0, 1.5, 2.0, 2.5, 3.0])
     y = np.array([17.5, 12.9, 9.5, 7.2, 5.8, 5.5, 7.1, 9.7, 13.5, 18.4, 24.4])
-    
+
     # Section Generating Scatterplot
     generate_scatterplot(x, y, "x", "y")
 
